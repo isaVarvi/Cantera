@@ -65,35 +65,57 @@ Una sola key `cantera-mudanza-v1`, JSON serializado:
 
 ```js
 {
-  version: 1,
+  version: 2,
   mode: "ida" | "regreso",
   dates: { ida: "2026-08-15", regreso: "" },   // input type=date, opcional
   categories: [
     {
       id: "cocina",
       name: "Cocina (compartida)",
+      kind: "items",              // "items" (empaque) | "tasks" (Antes de irme)
+      group: null,                // null | "antes-de-irme"
       items: [ { id: "cocina-0", text: "Plato, tazón y taza personales" }, ... ]
+    },
+    {
+      id: "casa",
+      name: "Casa / cuarto actual",
+      kind: "tasks",
+      group: "antes-de-irme",
+      items: [
+        ...,
+        { id: "casa-6", text: "Revisar qué necesitas comprar...", dynamic: "pendingCount" }
+      ]
     },
     ...
   ],
   checks: {
     ida:     { "cocina-0": true, ... },  // solo entradas marcadas; ausente = sin marcar
     regreso: { "cocina-0": false, ... }
-  }
+  },
+  taskChecks: { "tramites-0": true, ... }  // check de "Antes de irme", NO por modo
 }
 ```
 
 - `categories` es la única fuente de verdad de qué ítems existen — compartida entre
-  ambos modos.
-- `checks.ida` y `checks.regreso` son mapas independientes `itemId -> boolean`.
-- Los ítems por default (ver `DEFAULT_CATEGORIES` en `app.js`) se generan una sola vez,
-  la primera vez que se carga la app sin datos guardados. Si en el futuro se agregan
-  categorías/ítems nuevos al código, **no aparecerán automáticamente** para quien ya
-  tiene datos guardados (no hay migración) — habría que agregarlos a mano desde la UI o
-  ampliar `load()` en `app.js` para mergear.
+  ambos modos (para `kind: "items"`).
+- `checks.ida` / `checks.regreso`: mapas independientes `itemId -> boolean`, solo para
+  categorías `kind: "items"`.
+- `taskChecks`: un solo mapa `itemId -> boolean` para categorías `kind: "tasks"` — no se
+  repite entre Ida/Regreso porque son pendientes de una sola vez.
+- `checksFor(cat)` en `app.js` decide qué mapa usar según `cat.kind`.
+- Los ítems por default (`DEFAULT_CATEGORIES` + `DEFAULT_TASK_CATEGORIES` en `app.js`) se
+  generan una sola vez, la primera vez que se carga la app sin datos guardados.
+- **Sí hay migración** para categorías/ítems nuevos agregados al código después de que ya
+  existan datos guardados, pero solo a nivel de grupo: `load()` agrega las categorías de
+  `group: "antes-de-irme"` completas si no existen todavía (ver `hasTaskGroup` en
+  `load()`). Agregar un ítem suelto a una categoría *ya existente* sigue sin propagarse
+  solo — habría que hacerlo a mano desde la UI o ampliar `load()`.
 
-Categorías iniciales y conteo de ítems: Cocina (12), Cuarto (17), Baño (12), Lavandería
+Categorías de empaque y conteo de ítems: Cocina (12), Cuarto (17), Baño (12), Lavandería
 (7), Para andar/mochila diaria (6), Random/seguridad (14), Ropa (6). Total: 74 ítems.
+
+Subcategorías de "Antes de irme": Trámites y documentos (6), Transporte (4), Casa/cuarto
+actual (7), Salud y bienestar (4), Social/logística (5). Total: 26 ítems.
 
 ---
 
@@ -113,10 +135,53 @@ Todo lo del pedido original está hecho:
 10. Contador de días ("Faltan X días") por fecha de ida/regreso, opcional.
 11. Funciona offline una vez cargada — no hay ninguna llamada de red en el código.
 
-Todo el render es un `render()` que reconstruye el DOM de `#categories` desde `state` en
-cada cambio, con event delegation en el contenedor (`categoriesEl.addEventListener`) en
-vez de re-bindear listeners por ítem — así no hay que preocuparse por listeners huérfanos
-al agregar/eliminar ítems.
+Todo el render es un `render()` que reconstruye el DOM desde `state` en cada cambio, con
+event delegation en `.app` (`appEl.addEventListener`) en vez de re-bindear listeners por
+ítem — así no hay que preocuparse por listeners huérfanos al agregar/eliminar ítems, y el
+mismo delegado cubre tanto `#categories` como `#antes-de-irme-list`.
+
+### "Antes de irme" (2026-07-19)
+
+Segunda sección, mismo componente de checklist (`renderCategory()`), pero categorías con
+`kind: "tasks"` y `group: "antes-de-irme"` en vez de `kind: "items"`. Diferencias clave
+frente al checklist de empaque:
+
+- **Check independiente de Ida/Regreso** (`state.taskChecks`, no `state.checks[mode]`):
+  son pendientes de una sola vez ("antes de irme a Qro"), no algo que se repite al volver.
+  `checksFor(cat)` decide qué mapa usar según `cat.kind`.
+- 5 subcategorías: Trámites y documentos, Transporte, Casa/cuarto actual, Salud y
+  bienestar, Social/logística (26 ítems en total).
+- Un ítem especial en "Casa/cuarto actual" tiene `dynamic: "pendingCount"` — su texto se
+  calcula en cada render (`getItemDisplayText()`) mostrando cuántos ítems del checklist
+  de empaque (modo actual) siguen sin marcar. El texto base (`item.text`) no incluye el
+  conteo — se le pega el sufijo solo al mostrarlo, así editar el ítem no lo rompe.
+- Diferenciación visual: `.category--tasks` (borde izquierdo sage) + ícono `✓` vs `▪` en
+  el header — mismo componente, look distinto.
+- **Migración:** `load()` revisa si el estado guardado ya tiene categorías con
+  `group === "antes-de-irme"`; si no, las agrega (y agrega `taskChecks: {}` si falta) sin
+  tocar el progreso de empaque existente. Necesario porque la app ya estaba desplegada
+  antes de este cambio.
+- La barra de progreso global ("X/Y empacado") **excluye** categorías `kind: "tasks"`
+  a propósito — tiene su propia barra en el header de la sección ("X/Y listo").
+
+### Sugerencia random (2026-07-19)
+
+Widget en `#suggestion-widget`, con tres estados manejados por una variable de módulo
+`widgetMode` ("idle" | "suggestion" | "empty") + `currentSuggestion`:
+
+- **idle:** botón "¿No sabes qué hacer? →".
+- **suggestion:** elige un ítem al azar **sin marcar de TODAS las categorías** (empaque +
+  antes de irme, `getAllPendingSuggestions()`), con botones "Marcar como hecho ✓" (marca
+  y pide una nueva sugerencia automáticamente) y "Otra sugerencia" (excluye la actual del
+  sorteo si hay más de una pendiente).
+- **empty:** mensaje "¡Ya no hay pendientes, estás list@ para Qro! 🎉" con botón "Revisar
+  de nuevo" (útil si agrega ítems nuevos después).
+- `renderSuggestionWidget()` se llama al final de cada `render()` global y revalida la
+  sugerencia mostrada (por si el ítem se marcó/borró desde su propia categoría en vez de
+  desde el widget) — si ya no es válida, vuelve a "idle".
+- Animación: clase `.suggestion-anim` (`@keyframes suggestionIn`, fade + slide de 6px) que
+  se remueve y re-agrega forzando reflow (`void el.offsetWidth`) para que se reinicie en
+  cada cambio de contenido.
 
 ---
 
@@ -150,8 +215,9 @@ al agregar/eliminar ítems.
 - Si algún día se necesita ver el progreso desde más de un dispositivo, evaluar migrar
   de `localStorage` a algo sincronizado (Firebase) — **no vale la pena para v1**, es un
   solo dispositivo por 5 meses.
-- Migración de datos por defecto si se agregan categorías/ítems nuevos al código después
-  de que Isabela ya tenga datos guardados (ver nota en §4).
+- La migración de `load()` solo cubre grupos completos nuevos (ver §4). Si se agrega un
+  ítem suelto a una categoría existente en el código, no aparece solo para quien ya tiene
+  datos guardados.
 
 ---
 

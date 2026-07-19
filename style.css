@@ -212,6 +212,154 @@ h1, h2 {
   transition: width 0.25s ease;
 }
 
+/* Section titles */
+.section-title {
+  font-size: 1rem;
+  color: var(--terracota-dark);
+  margin: 0.3rem 0 0.1rem;
+}
+
+/* Sugerencia random */
+.suggestion-widget {
+  margin: 0.1rem 0 0.9rem;
+}
+
+.suggestion-cta {
+  width: 100%;
+  border: 1.5px dashed var(--terracota);
+  background: linear-gradient(135deg, var(--surface-soft), var(--surface));
+  color: var(--terracota-dark);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  text-align: center;
+}
+
+.suggestion-cta:active {
+  background: var(--surface-soft);
+}
+
+.suggestion-card {
+  background: linear-gradient(135deg, var(--surface-soft), var(--surface) 70%);
+  border: 1.5px solid var(--gold);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.1rem;
+  box-shadow: var(--shadow);
+}
+
+.suggestion-card--done {
+  border-color: var(--sage);
+  text-align: center;
+}
+
+.suggestion-eyebrow {
+  margin: 0 0 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--terracota-dark);
+}
+
+.suggestion-text {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text);
+}
+
+.suggestion-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.suggestion-card--done .suggestion-actions {
+  justify-content: center;
+}
+
+.suggestion-btn {
+  border: 1.5px solid var(--terracota);
+  background: transparent;
+  color: var(--terracota-dark);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.5rem 0.8rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.suggestion-btn--primary {
+  background: var(--terracota);
+  color: #fff;
+  border-color: var(--terracota);
+}
+
+.suggestion-btn:active {
+  opacity: 0.8;
+}
+
+@keyframes suggestionIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.suggestion-anim {
+  animation: suggestionIn 0.28s ease;
+}
+
+/* Antes de irme (sección de tareas) */
+.task-section {
+  background: var(--surface-soft);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+  padding: 0.9rem 0.9rem 1rem;
+  margin-bottom: 0.3rem;
+}
+
+.task-section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.task-section-header h2 {
+  font-size: 1.1rem;
+  color: var(--terracota-dark);
+}
+
+.task-section-sub {
+  margin: 0.15rem 0 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.task-section-progress {
+  min-width: 130px;
+  flex: 1;
+  max-width: 190px;
+}
+
+.task-section-progress .progress-label {
+  font-size: 0.75rem;
+  display: block;
+  margin-bottom: 0.3rem;
+  text-align: right;
+}
+
+.task-section .categories {
+  gap: 0.7rem;
+}
+
 /* Categories */
 .categories {
   display: flex;
@@ -228,11 +376,33 @@ h1, h2 {
   padding: 0.9rem 0.9rem 0.7rem;
 }
 
+.category--tasks {
+  border-left: 3px solid var(--sage);
+}
+
 .category-header {
   display: flex;
   align-items: center;
   gap: 0.6rem;
   margin-bottom: 0.55rem;
+}
+
+.cat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  border-radius: 50%;
+  background: var(--surface-soft);
+  color: var(--cantera);
+  font-size: 0.7rem;
+  flex-shrink: 0;
+}
+
+.category--tasks .cat-icon {
+  color: var(--sage);
 }
 
 .category-header h2 {
