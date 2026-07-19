@@ -130,22 +130,23 @@ al agregar/eliminar ítems.
 - ✅ `git init` local, primer commit, identidad `Isabela Varela <isavarelavi@gmail.com>`
   (misma que en los proyectos hermanos).
 - ✅ **Vercel:** desplegado en **https://pagina-web-4-cantera.vercel.app** (cuenta
-  `varvi`, la misma de Cozy To-Do). Deploy manual por ahora (`vercel --prod` desde la
-  carpeta) — no auto-deploy porque todavía no estaba conectado a GitHub.
-- ⬜ **GitHub:** en proceso — conectar repo para que el deploy en Vercel sea automático
-  en cada push (igual que Cozy To-Do → `github.com/isaVarvi/Cozy-To-Do`).
+  `varvi`, la misma de Cozy To-Do).
+- ✅ **GitHub:** **https://github.com/isaVarvi/Cantera** (repo público), conectado al
+  proyecto de Vercel (`vercel git connect`) — **cada push a `master` redespliega
+  automático**, igual que Cozy To-Do.
 
 ## Deploy
 
 - **Vercel:** https://pagina-web-4-cantera.vercel.app
-  - Para republicar tras un cambio: `npx vercel --prod` desde esta carpeta.
-- **GitHub:** (pendiente de confirmar URL final tras conectar)
+- **GitHub:** https://github.com/isaVarvi/Cantera
+- Flujo normal desde ahora: editar → `git add` / `git commit` / `git push` → Vercel
+  redespliega solo. `vercel --prod` manual ya no debería hacer falta salvo para probar
+  algo sin commitear.
 
 ---
 
 ## 7. Roadmap / ideas futuras (no en v1, no diseñar todavía)
 
-- Conectar GitHub → Vercel para auto-deploy en cada push (en proceso).
 - Si algún día se necesita ver el progreso desde más de un dispositivo, evaluar migrar
   de `localStorage` a algo sincronizado (Firebase) — **no vale la pena para v1**, es un
   solo dispositivo por 5 meses.
