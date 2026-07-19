@@ -457,6 +457,83 @@
       .forEach(function (cat) { taskListEl.appendChild(renderCategory(cat)); });
 
     renderSuggestionWidget();
+    renderDashboard();
+  }
+
+  // ---- Dashboard (resumen + gráficas) ----
+  function groupTotals(filterFn) {
+    var done = 0, total = 0;
+    state.categories.filter(filterFn).forEach(function (cat) {
+      var p = categoryProgress(cat);
+      done += p.done;
+      total += p.total;
+    });
+    return { done: done, total: total };
+  }
+
+  function meterMarkup(label, totals, slot) {
+    var pct = totals.total ? Math.round((totals.done / totals.total) * 100) : 0;
+    return '' +
+      '<div class="meter">' +
+        '<div class="meter-top">' +
+          '<span class="meter-label">' + escapeHtml(label) + '</span>' +
+          '<span class="meter-value">' + pct + '%</span>' +
+        '</div>' +
+        '<div class="meter-track meter-track--' + slot + '"><div class="meter-fill meter-fill--' + slot + '" style="width:' + pct + '%"></div></div>' +
+        '<p class="meter-sub">' + totals.done + '/' + totals.total + '</p>' +
+      '</div>';
+  }
+
+  function statTile(value, label) {
+    return '<div class="stat-tile"><span class="stat-value">' + escapeHtml(String(value)) + '</span><span class="stat-tile-label">' + escapeHtml(label) + '</span></div>';
+  }
+
+  function barRow(cat) {
+    var p = categoryProgress(cat);
+    var pct = p.total ? Math.round((p.done / p.total) * 100) : 0;
+    var slot = cat.kind === "tasks" ? "b" : "a";
+    var icon = cat.kind === "tasks" ? "✓" : "▪";
+    return '' +
+      '<div class="bar-row">' +
+        '<div class="bar-row-top">' +
+          '<span class="bar-row-name">' + icon + ' ' + escapeHtml(cat.name) + '</span>' +
+          '<span class="bar-row-frac">' + p.done + '/' + p.total + '</span>' +
+        '</div>' +
+        '<div class="bar-track"><div class="bar-fill bar-fill--' + slot + '" style="width:' + pct + '%"></div></div>' +
+      '</div>';
+  }
+
+  function renderDashboard() {
+    var packing = groupTotals(function (c) { return c.kind !== "tasks"; });
+    var tasks = groupTotals(function (c) { return c.kind === "tasks"; });
+    var pendingTotal = (packing.total - packing.done) + (tasks.total - tasks.done);
+
+    var d = daysLeft(state.dates[state.mode]);
+    var daysValue, daysLabel;
+    if (d === null) {
+      daysValue = "—";
+      daysLabel = "agrega tu fecha";
+    } else if (d <= 0) {
+      daysValue = "0";
+      daysLabel = state.mode === "ida" ? "ya es tu ida" : "ya es tu regreso";
+    } else {
+      daysValue = String(d);
+      daysLabel = state.mode === "ida" ? "días para tu ida" : "días para tu regreso";
+    }
+
+    var html = '<h2 class="dashboard-title">Resumen</h2>';
+    html += meterMarkup("Empaque", packing, "a");
+    html += meterMarkup("Antes de irme", tasks, "b");
+    html += '<div class="stat-row">' + statTile(pendingTotal, "pendientes en total") + statTile(daysValue, daysLabel) + '</div>';
+    html += '<div class="dashboard-section">';
+    html += '<div class="chart-legend">' +
+      '<span class="legend-item"><span class="legend-dot legend-dot--a"></span>Empaque</span>' +
+      '<span class="legend-item"><span class="legend-dot legend-dot--b"></span>Antes de irme</span>' +
+    '</div>';
+    html += '<div class="bars-list">' + state.categories.map(barRow).join("") + '</div>';
+    html += '</div>';
+
+    document.getElementById("dashboard").innerHTML = html;
   }
 
   function escapeHtml(str) {

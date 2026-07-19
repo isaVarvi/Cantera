@@ -34,36 +34,42 @@
       <p class="countdown" id="countdown">Agrega una fecha para ver la cuenta regresiva.</p>
     </section>
 
-    <section class="progress-global" aria-label="Progreso general">
-      <div class="progress-global-top">
-        <span class="progress-label" id="global-label">0/0 empacado</span>
-        <button type="button" class="btn-link" id="reset-global">Reiniciar todo</button>
-      </div>
-      <div class="progress-track">
-        <div class="progress-fill" id="global-fill"></div>
-      </div>
-    </section>
-
-    <section class="suggestion-widget" id="suggestion-widget" aria-live="polite"></section>
-
-    <section class="task-section" id="antes-de-irme">
-      <div class="task-section-header">
-        <div>
-          <h2>Antes de irme</h2>
-          <p class="task-section-sub">Pendientes antes de tu ida a Querétaro</p>
-        </div>
-        <div class="task-section-progress">
-          <span class="progress-label" id="tasks-global-label">0/0 listo</span>
-          <div class="progress-track">
-            <div class="progress-fill" id="tasks-global-fill"></div>
+    <div class="layout">
+      <div class="main-col">
+        <section class="progress-global" aria-label="Progreso general">
+          <div class="progress-global-top">
+            <span class="progress-label" id="global-label">0/0 empacado</span>
+            <button type="button" class="btn-link" id="reset-global">Reiniciar todo</button>
           </div>
-        </div>
-      </div>
-      <div id="antes-de-irme-list" class="categories"></div>
-    </section>
+          <div class="progress-track">
+            <div class="progress-fill" id="global-fill"></div>
+          </div>
+        </section>
 
-    <h2 class="section-title">Empaque</h2>
-    <main id="categories" class="categories"></main>
+        <section class="suggestion-widget" id="suggestion-widget" aria-live="polite"></section>
+
+        <section class="task-section" id="antes-de-irme">
+          <div class="task-section-header">
+            <div>
+              <h2>Antes de irme</h2>
+              <p class="task-section-sub">Pendientes antes de tu ida a Querétaro</p>
+            </div>
+            <div class="task-section-progress">
+              <span class="progress-label" id="tasks-global-label">0/0 listo</span>
+              <div class="progress-track">
+                <div class="progress-fill" id="tasks-global-fill"></div>
+              </div>
+            </div>
+          </div>
+          <div id="antes-de-irme-list" class="categories"></div>
+        </section>
+
+        <h2 class="section-title">Empaque</h2>
+        <main id="categories" class="categories"></main>
+      </div>
+
+      <aside class="dashboard" id="dashboard" aria-label="Resumen de progreso"></aside>
+    </div>
 
     <footer class="app-footer">
       <p>Se guarda solo en este celular. Sin cuentas, sin internet necesario una vez cargada.</p>

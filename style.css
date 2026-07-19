@@ -17,6 +17,13 @@
   --shadow: 0 2px 10px rgba(59, 43, 36, 0.08);
   --font-heading: Georgia, "Iowan Old Style", "Times New Roman", serif;
   --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  /* Colores de gráficas (separados de --terracota/--sage de UI): validados para
+     contraste, piso de croma y separación CVD -- ver PROYECTO.md */
+  --chart-a: #BF5B34; /* Empaque */
+  --chart-b: #178F6E; /* Antes de irme */
+  --chart-a-track: color-mix(in oklab, var(--chart-a) 20%, var(--surface-soft));
+  --chart-b-track: color-mix(in oklab, var(--chart-b) 20%, var(--surface-soft));
 }
 
 @media (prefers-color-scheme: dark) {
@@ -34,6 +41,8 @@
     --sage: #9BB491;
     --danger: #E37C63;
     --shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+    --chart-a: #CE7040;
+    --chart-b: #209A75;
   }
 }
 
@@ -210,6 +219,208 @@ h1, h2 {
   background: linear-gradient(90deg, var(--gold), var(--terracota));
   border-radius: 999px;
   transition: width 0.25s ease;
+}
+
+/* Layout: checklist + dashboard */
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.main-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+/* Dashboard (resumen + gráficas) */
+.dashboard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 1rem 1.1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dashboard-title {
+  font-size: 1.05rem;
+  color: var(--terracota-dark);
+}
+
+.meter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.meter-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.meter-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.meter-value {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.meter-track {
+  width: 100%;
+  height: 12px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.meter-track--a { background: var(--chart-a-track); }
+.meter-track--b { background: var(--chart-b-track); }
+
+.meter-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.35s ease;
+}
+
+.meter-fill--a { background: var(--chart-a); }
+.meter-fill--b { background: var(--chart-b); }
+
+.meter-sub {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.stat-row {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.stat-tile {
+  flex: 1;
+  background: var(--surface-soft);
+  border-radius: var(--radius-md);
+  padding: 0.6rem 0.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.stat-value {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--terracota-dark);
+}
+
+.stat-tile-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
+.dashboard-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.chart-legend {
+  display: flex;
+  gap: 0.9rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.legend-dot {
+  width: 9px;
+  height: 9px;
+  min-width: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legend-dot--a { background: var(--chart-a); }
+.legend-dot--b { background: var(--chart-b); }
+
+.bars-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.bar-row-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin-bottom: 0.2rem;
+}
+
+.bar-row-name {
+  font-size: 0.78rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bar-row-frac {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.bar-track {
+  width: 100%;
+  height: 7px;
+  background: var(--surface-soft);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.bar-fill--a { background: var(--chart-a); }
+.bar-fill--b { background: var(--chart-b); }
+
+@media (min-width: 880px) {
+  .app { max-width: 1120px; }
+
+  .layout {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1.4rem;
+  }
+
+  .main-col { flex: 1 1 60%; }
+
+  .dashboard {
+    flex: 0 0 320px;
+    max-width: 360px;
+  }
 }
 
 /* Section titles */

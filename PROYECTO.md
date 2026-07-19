@@ -183,6 +183,40 @@ Widget en `#suggestion-widget`, con tres estados manejados por una variable de m
   se remueve y re-agrega forzando reflow (`void el.offsetWidth`) para que se reinicie en
   cada cambio de contenido.
 
+### Dashboard / gráficas (2026-07-19)
+
+Pedido: layout de dos columnas — checklist de un lado, gráficas de progreso del otro.
+`<aside class="dashboard" id="dashboard">` (en `index.html`, dentro de `.layout` junto a
+`.main-col`), poblado por `renderDashboard()` en cada `render()`.
+
+- **Layout responsivo:** `.layout` es `flex-direction: column` (dashboard queda al final,
+  después de "Empaque") hasta 880px; a partir de ahí (`@media (min-width: 880px)`) pasa a
+  `row` y `.app` crece a `max-width: 1120px`. En mobile el dashboard **no** se reordena
+  arriba — sigue siendo checklist-first, el dashboard queda al fondo de la página (es un
+  bonus, no compite con el uso principal de empacar desde el celular).
+- **Colores de gráfica separados de los de UI:** `--chart-a` (Empaque) y `--chart-b`
+  (Antes de irme) en vez de reusar `--terracota`/`--sage` directamente. Necesario porque
+  `--terracota`/`--sage` (sobre todo en modo oscuro, L≈0.7) no pasaban el validador de
+  `dataviz` (piso de lightness/croma para uso categórico en gráficas) — se recalibraron
+  valores específicos para gráficas que sí pasan:
+  `node scripts/validate_palette.js "#BF5B34,#178F6E" --mode light` y
+  `"#CE7040,#209A75" --mode dark` → **ALL CHECKS PASS** (CVD queda en banda 6.3–7.8, WARN,
+  legal solo con codificación secundaria — por eso cada barra/leyenda siempre lleva
+  ícono + texto, nunca solo color). `--chart-a-track`/`--chart-b-track` son
+  `color-mix(in oklab, var(--chart-a) 20%, var(--surface-soft))` — track más clara del
+  mismo tono, no gris genérico.
+- **Qué se muestra** (según `references/choosing-a-form.md` de la skill `dataviz`: una
+  proporción sola → *meter*, no dona/pie; magnitud comparada entre categorías → *bar
+  chart*; un valor puntual → *stat tile*):
+  - Dos **meters** grandes (barra + valor %): "Empaque" y "Antes de irme".
+  - Dos **stat tiles**: pendientes totales (suma de ambos grupos) y días restantes
+    (según la fecha del modo actual — reusa `daysLeft()`).
+  - **Bar chart** de las 12 categorías (7 empaque + 5 antes de irme), ordenadas como
+    aparecen en `state.categories`, coloreadas por grupo (`--chart-a`/`--chart-b`) con
+    leyenda de 2 ítems arriba (obligatoria por tener ≥2 series, per skill `dataviz`).
+- Todo recalcula en cada `render()` — no hay estado propio del dashboard, es una vista
+  derivada de `state.categories` + `state.checks` + `state.taskChecks`.
+
 ---
 
 ## 6. Estado actual
