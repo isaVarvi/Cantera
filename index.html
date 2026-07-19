@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#BF5B34" />
+  <title>Cantera · Checklist de mudanza a Querétaro</title>
+  <meta name="description" content="Checklist de mudanza a Querétaro, con modo Ida y Regreso, que se guarda en tu celular." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧳</text></svg>" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">◆</span>
+        <div>
+          <h1>Cantera</h1>
+          <p class="tagline">checklist de mudanza a Querétaro</p>
+        </div>
+      </div>
+
+      <div class="mode-switch" role="tablist" aria-label="Modo de empaque">
+        <button type="button" class="mode-btn" data-mode="ida" role="tab" aria-selected="true">Ida · Ago</button>
+        <button type="button" class="mode-btn" data-mode="regreso" role="tab" aria-selected="false">Regreso · Dic</button>
+      </div>
+    </header>
+
+    <section class="trip-bar">
+      <label class="date-field">
+        <span id="date-label">Fecha de ida</span>
+        <input type="date" id="trip-date" />
+      </label>
+      <p class="countdown" id="countdown">Agrega una fecha para ver la cuenta regresiva.</p>
+    </section>
+
+    <section class="progress-global" aria-label="Progreso general">
+      <div class="progress-global-top">
+        <span class="progress-label" id="global-label">0/0 empacado</span>
+        <button type="button" class="btn-link" id="reset-global">Reiniciar todo</button>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="global-fill"></div>
+      </div>
+    </section>
+
+    <main id="categories" class="categories"></main>
+
+    <footer class="app-footer">
+      <p>Se guarda solo en este celular. Sin cuentas, sin internet necesario una vez cargada.</p>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
